@@ -3,3 +3,8 @@
 ################################################################################
 
 /.vs/MD_Test/v14
+/Debug
+/MD_Test.VC.db
+/MD_Test.vcxproj.filters
+/MD_Test.VC.VC.opendb
+/MD_Test.vcxproj
