@@ -1,7 +1,7 @@
 #include <limits.h>
 
 #define NUM_ELEMENTS 6
-#define NUM_MOLECULES 21
+#define NUM_MOLECULES 23
 
 #define MAX_NUM_ATOMS_PER_AA 24
 #define MAX_NUM_BONDS_PER_ATOM 4
@@ -10,16 +10,17 @@ typedef struct Element {
 	char letter;
 	char name[11];
 	char color[7];
+	char maxNumBonds;
 } Element;
 
 const Element ElementsList[(NUM_ELEMENTS + 1)] = {
-		{ '\0', "", "" },					// 0
-		{ 'H', "Hydrogen"  , "white"  },	// 1
-		{ 'C', "Carbon"    , "black"  },	// 2
-		{ 'O', "Oxygen"    , "red"    },	// 3
-		{ 'N', "Nitrogen"  , "blue"   },	// 4
-		{ 'S', "Sulfur"    , "yellow" },	// 5
-		{ 'P', "Phosphorus", "orange" }		// 6
+		{ '\0', "", "", 0 },					// 0
+		{ 'H', "Hydrogen"	, "white"	, 1 },	// 1
+		{ 'C', "Carbon"		, "black"	, 4 },	// 2
+		{ 'O', "Oxygen"		, "red"		, 6 },	// 3
+		{ 'N', "Nitrogen"	, "blue"	, 5 },	// 4
+		{ 'S', "Sulfur"		, "yellow"	, 6 },	// 5
+		{ 'P', "Phosphorus"	, "orange"	, 5 }	// 6
 };
 
 const unsigned char ElementIdLookupTable[32] =
@@ -33,39 +34,50 @@ const unsigned char ElementIdLookupTable[32] =
 const signed char MoleculeIdLookupTable[4][32] = {
 //_ , A , B , C , D , E , F , G , H , I , J , K , L , M , N , O , P , Q , R , S , T , U , V , W , X , Y , Z , _ , _ , _ , _ , _
 //    A*     Cys              G*  H* Ile          L* Met          P*         Ser  T*     Val
-{ 00, -1, 00,  5, 00, 00, 00, -2, -2, 10, 00, 00, -1, 13, 00, 00, -1, 00, 00, 16, -2, 00, 20, 00, 00, 00, 00, 00, 00, 00, 00, 00 },
+{ 00, -1, 00,  5, 00, 00, 00, -2, -2, 10, 00, 00, -1, 13, 00, 00, -1, 00, 00, 16, -2, 00, 20, 00, 00, 00, 00, 00, 00, 00, 00, 00 }, // [0]
 //_ , A , B , C , D , E , F , G , H , I , J , K , L , M , N , O , P , Q , R , S , T , U , V , W , X , Y , Z , _ , _ , _ , _ , _
 //   Ala             Phe     Arg                         Asn Pro Asp         Lys     Leu
-{ 00,  1, 00, 00, 00, 14, 00,  2, 00, 00, 00, 00, 00, 00,  3, 15,  4, 00, 00, 12, 00, 11, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 },
+{ 00,  1, 00, 00, 00, 14, 00,  2, 00, 00, 00, 00, 00, 00,  3, 15,  4, 00, 00, 12, 00, 11, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 }, // [1]
 //_ , A , B , C , D , E , F , G , H , I , J , K , L , M , N , O , P , Q , R , S , T , U , V , W , X , Y , Z , _ , _ , _ , _ , _
 //                               HOH                     Gln     Trp     T*r His     Glu             Gly
-{ 00, 00, 00, 00, 00, 00, 00, 00, 21, 00, 00, 00, 00, 00,  6, 00, 18, 00, -3,  9, 00,  7, 00, 00, 00,  8, 00, 00, 00, 00, 00, 00 },
+{ 00, 00, 00, 00, 00, 00, 00, 00, 21, 00, 00, 00, 00, 00,  6, 00, 18, 00, -3,  9, 00,  7, 00, 00, 00,  8, 00, 00, 00, 00, 00, 00 }, // [2]
 //_ , A , B , C , D , E , F , G , H , I , J , K , L , M , N , O , P , Q , R , S , T , U , V , W , X , Y , Z , _ , _ , _ , _ , _
 //                               Thr                                                                 Tyr
-{ 00, 00, 00, 00, 00, 00, 00, 00, 17, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 19, 00, 00, 00, 00, 00, 00 }
+{ 00, 00, 00, 00, 00, 00, 00, 00, 17, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 19, 00, 00, 00, 00, 00, 00 }  // [3]
 };
 
-// TODO: Add 'X' for "HXT" and "OXT"
-const unsigned char AtomPlacementLookupTable[32] = // Alpha,Beta,Gamma,Delta,Epsilon,Zeta,(H)Eta
+// TODO: Check if need to add 'N' (from "HN", "HN1" and "HN2")
+const unsigned char AtomPlacementLookupTable[32] = // Alpha,Beta,Gamma,Delta,Epsilon,Zeta,(H)Eta ; 'X' (from "HXT" and "OXT") same as 'A'
 //	 _,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,_,_,_,_,_
-	{0,1,2,0,4,5,0,3,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0};
+	{0,1,2,0,4,5,0,3,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,6,0,0,0,0,0};
 
 typedef struct Molecule {
 	char letter;
 	char abbrev[4];
 	char name[14];
 	unsigned char numberOfAtoms;
-	unsigned char numberOfBonds;
+	unsigned char numberOfBonds; // number of distinct bonds among all molecule atoms (including to previous and next residues' atoms)
 	char atomsCodes[MAX_NUM_ATOMS_PER_AA][5];
-	signed char atomsBonds[MAX_NUM_ATOMS_PER_AA][MAX_NUM_BONDS_PER_ATOM];
+	signed char atomsBonds[MAX_NUM_ATOMS_PER_AA][MAX_NUM_BONDS_PER_ATOM]; // contains ids from (0) to (numberOfAtoms-1)
 } Molecule;
+
+// TODO: Lookup "atom id" by "atom code" and "molecule id"
+// All atoms codes:
+// N , NE , NE(1,2) , NH(1,2) , ND(1,2) , NZ
+// O , OXT , OD(1,2) , OE(1,2) , OG , OG1 , OH
+// C , CA , CB , CG , CG(1,2) , CD , CD(1,2) , CE, CE(1,2,3) , CZ , CZ(2,3) , CH2
+// H , HXT , HA , HA(1,2) , HB , HB(1,2,3) , HG , HG(1,2) , HG1 , HG1(1,2,3) , HG2(1,2,3) ,
+//		HD(1,2) , HD1(1,2,3) , HD2(1,2,3) , HE(1,2,3) , HE2(1,2) ,
+//		HH , HH1(1,2) , HH2, HH2(1,2) , HZ , HZ(1,2,3)
+// SG , SD
+
 
 // TODO: find way to set bonds for extra "HXT" and "OXT" atoms
 // TODO: add pseudo-nucleotides for DNA and RNA
-//  00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
-// ___,Ala,Arg,Asn,Asp,Cys,Gln,Glu,Gly,His,Ile,Leu,Lys,Met,Phe,Pro,Ser,Thr,Trp,Tyr,Val,HOH
+//  00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+// ___,Ala,Arg,Asn,Asp,Cys,Gln,Glu,Gly,His,Ile,Leu,Lys,Met,Phe,Pro,Ser,Thr,Trp,Tyr,Val,HOH,HXT,OXT
 const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
-/*00*/	{ '\0', "", "", 0, 0 },
+/*00*/	{ '\0', "", "", 0, 0, NULL, NULL },
 /*01*/	{ 'A', "Ala", "Alanine"			, 10,	11, // (-CH3)
 		//  { 0 ,  1 , 2 , 3 ,  4 , 5 ,  6 ,   7 ,   8 ,   9 }
 			{"N","CA","C","O","CB","H","HA","HB1","HB2","HB3"},
@@ -470,12 +482,22 @@ const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
 				{6,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HG22"
 				{6,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }	//"HG23"
 		},
-/*21*/	{ '?', "HOH", "Water"			,	3,	2, // (O(-H)(-H))
+/*21*/	{ 'w', "HOH", "Water"			,	3,	2,	// (O(-H)(-H))
 		//  { 0 ,  1 ,  2 }
 			{"O","H1","H2"},
 			{	{1,2,SCHAR_MAX,SCHAR_MAX},			//"O"
 				{0,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"H1"
 				{0,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }	//"H2"
+		},
+/*22*/	{ 'h', "HXT", "Term.hydrogen"	,	1,	1,	// (H)
+		//  {  0  }
+			{"HXT"},
+			{	{-1,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }//"HXT" ? should connect to "OXT" (-1) or to "N" (not necessarily -1) ?
+		},
+/*23*/	{ 'o', "OXT", "Term.oxygen"		,	1,	2,	// (O)
+		//  {  0  }
+			{"OXT"},
+			{	{-1,+1,SCHAR_MAX,SCHAR_MAX} }		//"OXT" ? should connect to "C" (-1) and to "HXT" (+1) ?
 		}
 };
 
