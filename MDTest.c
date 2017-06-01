@@ -1,36 +1,20 @@
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+//#ifdef _MSC_VER
+//#define _CRT_SECURE_NO_WARNINGS
+//#endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <float.h>
 #include <math.h>
+#include "AtomsArray.h"
+#include "SVGGraphics.h"
 #include "ChemicalEntities.h"
 
-#define VERSION "0.1"
+#define VERSION "0.2"
 #define PAUSE_AT_EXIT 1
 //#define CHECK_MOLECULES 1
 #define ARRAY_GROW_SIZE 64
-
-typedef struct Atom {
-	unsigned int fromResidueId;
-	unsigned char atomIdInsideResidue;
-	char element;
-	float coordX;
-	float coordY;
-	float coordZ;
-} Atom;
-
-typedef struct Residue {
-	unsigned char moleculeId;
-	unsigned char fromModelId;
-	char fromChain;
-	// TODO: remove this?
-	signed char numExtraAtoms;
-	unsigned int startPositionInAtomsArray;
-} Residue;
 
 typedef struct PDBInfo {
 	char *fileName;
@@ -46,10 +30,10 @@ PDBInfo *allPDBsArray = NULL;
 int numPDBs = 0;
 
 // NOTE: position 0 in both arrays bellow is not used
-Atom *allAtomsArray = NULL;
-Residue *allResiduesArray = NULL;
-unsigned int totalNumAtoms = 0;
-unsigned int totalNumResidues = 0;
+//Atom *allAtomsArray = NULL;
+//Residue *allResiduesArray = NULL;
+//unsigned int totalNumAtoms = 0;
+//unsigned int totalNumResidues = 0;
 unsigned int maxAtomsArraySize = 0;
 unsigned int maxResiduesArraySize = 0;
 
@@ -69,6 +53,14 @@ void ExitErrorMessage(char *msg, int newline){
 	getchar();
 	#endif
 	exit(-1);
+}
+
+int GetAtomElementCode(Atom *atom) {
+	unsigned char molId;
+	char *atomName;
+	molId = (allResiduesArray[(atom->fromResidueId)].moleculeId);
+	atomName = (char *)MoleculesList[molId].atomsCodes[(atom->atomIdInsideResidue)];
+	return (int)(ElementIdLookupTable[CHAR2ID(atomName[0])]);
 }
 
 int GetElementCode(const char *atomName){
@@ -698,7 +690,7 @@ void GetInteratomicForceStats() {
 
 }
 
-// TODO: support loading from multiple PDB files
+// TODO: support loading from multiple PDB files; separated atoms array per model; 
 int main(int argc, char *argv[]){
 	int i;
 	printf("[ MDTest v%s ]\n", VERSION);
@@ -708,6 +700,7 @@ int main(int argc, char *argv[]){
 		printf("\nOptions:\n");
 		printf("\t-s\tGet bond length statistics\n");
 		printf("\t-f\tGet interatomic force statistics\n");
+		printf("\t-i\tCreate SVG image\n");
 		printf("\n");
 		return (-1);
 	}
@@ -737,6 +730,7 @@ int main(int argc, char *argv[]){
 	if (argv[1][0] == '-') {
 		if ((argv[1][1] == 'S') || (argv[1][1] == 's')) GetBondLengthStats();
 		if ((argv[1][1] == 'F') || (argv[1][1] == 'f')) GetInteratomicForceStats();
+		if ((argv[1][1] == 'I') || (argv[1][1] == 'i')) DrawAtoms();
 	}
 	printf("> Done!\n");
 	if (allAtomsArray != NULL) free(allAtomsArray);

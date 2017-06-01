@@ -7,7 +7,7 @@
 /MD_Test.VC.db
 /MD_Test.vcxproj.filters
 /MD_Test.VC.VC.opendb
-/MD_Test.vcxproj
+/MD_Test.vcxproj.user
 /.vs
 /.vs
 /Data
@@ -25,5 +25,3 @@
 /.vs/MD_Test/v15/Browse.VC.opendb
 /.vs/MD_Test/v15/Browse.VC.db
 /.vs/MD_Test/v15/.suo
-/Data/1CFC.pdb
-/MD_Test.vcxproj.user

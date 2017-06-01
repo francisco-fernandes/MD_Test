@@ -10,20 +10,24 @@ typedef struct Element {
 	char letter;
 	char name[11];
 	char color[7];
+	char colorCode1[8];
+	char colorCode2[8];
+	char colorCode3[8];
 	char maxNumBonds;
+	float atomicRadius;
 } Element;
 
-const Element ElementsList[(NUM_ELEMENTS + 1)] = {
-		{ '\0', "", "", 0 },					// 0
-		{ 'H', "Hydrogen"	, "white"	, 1 },	// 1
-		{ 'C', "Carbon"		, "black"	, 4 },	// 2
-		{ 'O', "Oxygen"		, "red"		, 6 },	// 3
-		{ 'N', "Nitrogen"	, "blue"	, 5 },	// 4
-		{ 'S', "Sulfur"		, "yellow"	, 6 },	// 5
-		{ 'P', "Phosphorus"	, "orange"	, 5 }	// 6
+static const Element ElementsList[(NUM_ELEMENTS + 1)] = {
+		{ '\0', "", "", "", "", "", 0 , 0.0 },												// 0
+		{ 'H', "Hydrogen"	, "white"	, "#DFDFDF"	, "#000000"	, "#FFFFFF"	, 1	, 0.37f },	// 1
+		{ 'C', "Carbon"		, "black"	, "#404040"	, "#000000"	, "#C0C0C0"	, 4	, 0.77f },	// 2
+		{ 'O', "Oxygen"		, "red"		, "#FF0000"	, "#7F0000"	, "#FFC080"	, 6	, 0.66f },	// 3
+		{ 'N', "Nitrogen"	, "blue"	, "#0000FF"	, "#00007F"	, "#C0C0FF"	, 5	, 0.70f },	// 4
+		{ 'S', "Sulfur"		, "yellow"	, "#FFFF00"	, "#7F7F00"	, "#FFFFC0"	, 6	, 1.04f },	// 5
+		{ 'P', "Phosphorus"	, "orange"	, "#FF7F00"	, "#7F3F00"	, "#FFE0C0"	, 5	, 1.10f }	// 6
 };
 
-const unsigned char ElementIdLookupTable[32] =
+static const unsigned char ElementIdLookupTable[32] =
 //	 _,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,_,_,_,_,_
 	{0,0,0,2,0,0,0,0,1,0,0,0,0,0,4,3,6,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0};
 
@@ -31,7 +35,7 @@ const unsigned char ElementIdLookupTable[32] =
 // [1] A**, L**, P** : al(A), ph(E), ar(G), as(N), pr(O), as(P), ly(S), le(U)
 // [2] G**, H**, T** : ho(H), gl(N), tr(P), t*(R), hi(S), gl(U), gl(Y)
 // [3] T*R           : t(H)r, t(Y)r
-const signed char MoleculeIdLookupTable[4][32] = {
+static const signed char MoleculeIdLookupTable[4][32] = {
 //_ , A , B , C , D , E , F , G , H , I , J , K , L , M , N , O , P , Q , R , S , T , U , V , W , X , Y , Z , _ , _ , _ , _ , _
 //    A*     Cys              G*  H* Ile          L* Met          P*         Ser  T*     Val
 { 00, -1, 00,  5, 00, 00, 00, -2, -2, 10, 00, 00, -1, 13, 00, 00, -1, 00, 00, 16, -2, 00, 20, 00, 00, 00, 00, 00, 00, 00, 00, 00 }, // [0]
@@ -47,7 +51,7 @@ const signed char MoleculeIdLookupTable[4][32] = {
 };
 
 // TODO: Check if need to add 'N' (from "HN", "HN1" and "HN2")
-const unsigned char AtomPlacementLookupTable[32] = // Alpha,Beta,Gamma,Delta,Epsilon,Zeta,(H)Eta ; 'X' (from "HXT" and "OXT") same as 'A'
+static const unsigned char AtomPlacementLookupTable[32] = // Alpha,Beta,Gamma,Delta,Epsilon,Zeta,(H)Eta ; 'X' (from "HXT" and "OXT") same as 'A'
 //	 _,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,_,_,_,_,_
 	{0,1,2,0,4,5,0,3,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,6,0,0,0,0,0};
 
@@ -76,7 +80,7 @@ typedef struct Molecule {
 // TODO: add pseudo-nucleotides for DNA and RNA
 //  00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
 // ___,Ala,Arg,Asn,Asp,Cys,Gln,Glu,Gly,His,Ile,Leu,Lys,Met,Phe,Pro,Ser,Thr,Trp,Tyr,Val,HOH,HXT,OXT
-const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
+static const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
 /*00*/	{ '\0', "", "", 0, 0, NULL, NULL },
 /*01*/	{ 'A', "Ala", "Alanine"			, 10,	11, // (-CH3)
 		//  { 0 ,  1 , 2 , 3 ,  4 , 5 ,  6 ,   7 ,   8 ,   9 }
