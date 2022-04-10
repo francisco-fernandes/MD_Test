@@ -1,0 +1,30 @@
+Shape Modelling Group
+IMATI
+3DOR (3D Object Retrieval)
+
+M. Daoudi -> Bag of words
+
+
+survey 3d shape retrieval
+tangelder 2008 
+
+3d shape histograms for similarity search and class. in spatial databases 1999
+hankerst
+|-> citações 
+
+multi-scale 3d shape representation and segmentation
+
+curvature shape descriptor salazar
+
+
+*multi-scale surface descriptors
+
+salient local visual features
+*salient local 3d features for ...
+ohbuchi
+
+funkhouser -> princeton, shape bioinformatics
+*ligand binding sites by combining...
+
+
+funkhouser, discussão que não eram apropriados para interacções proteína-proteína, pois a área de contacto era bastante grande e relativamente "flat".

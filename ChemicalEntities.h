@@ -10,21 +10,32 @@ typedef struct Element {
 	char letter;
 	char name[11];
 	char color[7];
-	char colorCode1[8];
-	char colorCode2[8];
-	char colorCode3[8];
+	char colorHexCode[8];
+	char colorHexCodeDarker[8];
+	char colorHexCodeLighter[8];
+	unsigned char colorHSLCode[3];
 	char maxNumBonds;
 	float atomicRadius;
 } Element;
 
+typedef struct Molecule {
+	char letter;
+	char abbrev[4];
+	char name[14];
+	unsigned char numberOfAtoms;
+	unsigned char numberOfBonds; // number of distinct bonds among all molecule atoms (including to previous and next residues' atoms)
+	char atomsCodes[MAX_NUM_ATOMS_PER_AA][5];
+	signed char atomsBonds[MAX_NUM_ATOMS_PER_AA][MAX_NUM_BONDS_PER_ATOM]; // contains ids from (0) to (numberOfAtoms-1)
+} Molecule;
+
 static const Element ElementsList[(NUM_ELEMENTS + 1)] = {
-		{ '\0', "", "", "", "", "", 0 , 0.0 },												// 0
-		{ 'H', "Hydrogen"	, "white"	, "#DFDFDF"	, "#000000"	, "#FFFFFF"	, 1	, 0.37f },	// 1
-		{ 'C', "Carbon"		, "black"	, "#404040"	, "#000000"	, "#C0C0C0"	, 4	, 0.77f },	// 2
-		{ 'O', "Oxygen"		, "red"		, "#FF0000"	, "#7F0000"	, "#FFC080"	, 6	, 0.66f },	// 3
-		{ 'N', "Nitrogen"	, "blue"	, "#0000FF"	, "#00007F"	, "#C0C0FF"	, 5	, 0.70f },	// 4
-		{ 'S', "Sulfur"		, "yellow"	, "#FFFF00"	, "#7F7F00"	, "#FFFFC0"	, 6	, 1.04f },	// 5
-		{ 'P', "Phosphorus"	, "orange"	, "#FF7F00"	, "#7F3F00"	, "#FFE0C0"	, 5	, 1.10f }	// 6
+		{ '\0', "", "", "", "", "", {0,0,0}, 0 , 0.0 },														// 0
+		{ 'H', "Hydrogen"	, "white"	, "#DFDFDF"	, "#000000"	, "#FFFFFF"	, {  0,  0, 80}	, 1	, 0.37f },	// 1
+		{ 'C', "Carbon"		, "black"	, "#404040"	, "#000000"	, "#C0C0C0"	, {  0,  0, 20}	, 4	, 0.77f },	// 2
+		{ 'O', "Oxygen"		, "red"		, "#FF0000"	, "#7F0000"	, "#FFC080"	, {  0,100, 50}	, 6	, 0.66f },	// 3
+		{ 'N', "Nitrogen"	, "blue"	, "#0000FF"	, "#00007F"	, "#C0C0FF"	, {240,100, 50}	, 5	, 0.70f },	// 4
+		{ 'S', "Sulfur"		, "yellow"	, "#FFFF00"	, "#7F7F00"	, "#FFFFC0"	, { 60,100, 50}	, 6	, 1.04f },	// 5
+		{ 'P', "Phosphorus"	, "orange"	, "#FF7F00"	, "#7F3F00"	, "#FFE0C0"	, { 30,100, 50}	, 5	, 1.10f }	// 6
 };
 
 static const unsigned char ElementIdLookupTable[32] =
@@ -55,15 +66,6 @@ static const unsigned char AtomPlacementLookupTable[32] = // Alpha,Beta,Gamma,De
 //	 _,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,_,_,_,_,_
 	{0,1,2,0,4,5,0,3,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,6,0,0,0,0,0};
 
-typedef struct Molecule {
-	char letter;
-	char abbrev[4];
-	char name[14];
-	unsigned char numberOfAtoms;
-	unsigned char numberOfBonds; // number of distinct bonds among all molecule atoms (including to previous and next residues' atoms)
-	char atomsCodes[MAX_NUM_ATOMS_PER_AA][5];
-	signed char atomsBonds[MAX_NUM_ATOMS_PER_AA][MAX_NUM_BONDS_PER_ATOM]; // contains ids from (0) to (numberOfAtoms-1)
-} Molecule;
 
 // TODO: Lookup "atom id" by "atom code" and "molecule id"
 // All atoms codes:
@@ -76,12 +78,13 @@ typedef struct Molecule {
 // SG , SD
 
 
+// TODO: add atom type by their connection, e.g. carbon with 3 Hs, carbon with double bond, carbon with oxygen, etc
 // TODO: find way to set bonds for extra "HXT" and "OXT" atoms
 // TODO: add pseudo-nucleotides for DNA and RNA
 //  00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
 // ___,Ala,Arg,Asn,Asp,Cys,Gln,Glu,Gly,His,Ile,Leu,Lys,Met,Phe,Pro,Ser,Thr,Trp,Tyr,Val,HOH,HXT,OXT
 static const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
-/*00*/	{ '\0', "", "", 0, 0, NULL, NULL },
+/*00*/	{ '\0', "", "", 0, 0, {0}, {0} },
 /*01*/	{ 'A', "Ala", "Alanine"			, 10,	11, // (-CH3)
 		//  { 0 ,  1 , 2 , 3 ,  4 , 5 ,  6 ,   7 ,   8 ,   9 }
 			{"N","CA","C","O","CB","H","HA","HB1","HB2","HB3"},
@@ -158,9 +161,9 @@ static const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
 				{4,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HB2"
 				{4,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }	//"HB3"
 		},								
-/*05*/	{ 'C', "Cys", "Cysteine"		, 10,	11, // (-CH2-SH) ... ? HG ?
-		//  { 0 ,  1 , 2 , 3 ,  4 ,  5 , 6 ,  7 ,   8 ,   9 }
-			{"N","CA","C","O","CB","SG","H","HA","HB2","HB3"},
+/*05*/	{ 'C', "Cys", "Cysteine"		, 11,	12, // (-CH2-SH) ... NOTE: HG can be absent
+		//  { 0 ,  1 , 2 , 3 ,  4 ,  5 , 6 ,  7 ,   8 ,   9 , 10 }
+			{"N","CA","C","O","CB","SG","H","HA","HB2","HB3","HG"},
 			{	{-1,1,6,SCHAR_MAX},					//"N"
 				{0,2,4,7},							//"CA"
 				{1,3,+10,SCHAR_MAX},				//"C"
@@ -170,7 +173,8 @@ static const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
 				{0,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"H"
 				{1,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HA"
 				{4,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HB2"
-				{4,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }	//"HB3"
+				{4,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HB3"
+				{5,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }	//"HG"
 		},
 /*06*/	{ 'Q', "Gln", "Glutamine"		, 17,	18, // (-CH2-CH2-CO-N2)
 		//  { 0 ,  1 , 2 , 3 ,  4 ,  5 ,  6 ,   7 ,   8 , 9 , 10 ,  11 ,  12 ,  13 ,  14 ,   15 ,   16 }
@@ -223,7 +227,7 @@ static const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
 				{1,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HA2"
 				{1,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }	//"HA3"
 		},
-/*09*/	{ 'H', "His", "Histidine"		, 18,	19, // (-CH2-C[-CH-N-CH-NH-]) ... ? HE2 ?
+/*09*/	{ 'H', "His", "Histidine"		, 18,	19, // (-CH2-C[-CH-N-CH-NH-]) ... NOTE: can have both HD1 and HE2, or only one of them
 		//  { 0 ,  1 , 2 , 3 ,  4 ,  5 ,   6 ,   7 ,   8 ,   9 , 10, 11 ,  12 ,  13 ,  14 ,  15 ,  16 ,  17 }
 			{"N","CA","C","O","CB","CG","ND1","CD2","CE1","NE2","H","HA","HB2","HB3","HD1","HD2","HE1","HE2"},
 			{	{-1,1,10,SCHAR_MAX},				//"N"
@@ -243,7 +247,7 @@ static const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
 				{6,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HD1"
 				{7,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HD2"
 				{8,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HE1"
-				{9,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }	//"HE2"	
+				{9,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }	//"HE2"
 		},
 /*10*/	{ 'I', "Ile", "Isoleucine"		, 19,	20, // (-CH(-CH3)(-CH2-CH3))
 		//  { 0 ,  1 , 2 , 3 ,  4 ,   5 ,   6 ,   7 , 8 ,  9 , 10 ,   11 ,   12 ,   13 ,   14 ,   15 ,   16 ,   17 ,   18 }
@@ -291,7 +295,7 @@ static const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
 				{7,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX},	//"HD22"
 				{7,SCHAR_MAX,SCHAR_MAX,SCHAR_MAX} }	//"HD23"
 		},
-/*12*/	{ 'K', "Lys", "Lysine"			, 22,	22, // (-CH2-CH2-CH2-CH2-NH3) ... ? HZ3 ?
+/*12*/	{ 'K', "Lys", "Lysine"			, 22,	22, // (-CH2-CH2-CH2-CH2-NH3) ... NOTE: HZ3 can be absent
 		//  { 0 ,  1 , 2 , 3 ,  4 ,  5 ,  6 ,  7 ,  8 , 9 , 10 ,  11 ,  12 ,  13 ,  14 ,  15 ,  16 ,  17 ,  18 ,  19 ,  20 ,  21 }
 			{"N","CA","C","O","CB","CG","CD","CE","NZ","H","HA","HB2","HB3","HG2","HG3","HD2","HD3","HE2","HE3","HZ1","HZ2","HZ3"},
 			{	{-1,1,9,SCHAR_MAX},					//"N"
@@ -514,3 +518,6 @@ static const Molecule MoleculesList[(NUM_MOLECULES+1)] = {
 #define GET_PLACEMENT_ORDER(moleculeId,atomId) (AtomPlacementLookupTable[ CHAR2ID( MoleculesList[(moleculeId)].atomsCodes[(atomId)][1] ) ])
 // 0,1,2,3
 #define GET_EXTRA_PLACEMENT_ORDER(moleculeId,atomId) ((int) ( (MoleculesList[(moleculeId)].atomsCodes[(atomId)][2]) & 0x0F ) )
+
+int GetElementCode(const char *atomName);
+int GetMoleculeCode(char *moleculeName);

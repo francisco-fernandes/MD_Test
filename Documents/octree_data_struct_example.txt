@@ -1,0 +1,11 @@
+http://bcmpinc.wordpress.com/2014/10/29/new-data-format/
+struct octree {
+    uint32_t avgcolor:24;
+    uint32_t bitmask : 8;
+    uint32_t child[0];
+};
+
+The child array with length 0 denotes a variable length array. As it has size 0, the size of the struct is 4 bytes, plus 4 bytes for every child. Which child nodes exist is stored in the bitmask. Usually, the child array stores the index to the child nodes, such that given an array octree[N] a child node is stored at, for example, octree[node.child[2]]. In the last layer I don’t store pointers to the leaf nodes, but just store the colors of the leaf nodes (or’ed with 0xff000000, so they are kind of hard coded leaf nodes).
+
+****
+A clever scheme is used to store BVH leaf nodes and inner nodes using the same data structure: instead of using a separate struct for leaf nodes and inner nodes, both types of nodes occupy the same memory space (using a union), which stores either two child indices to the left and right child when dealing with an inner node or a start index into the list of triangles and a triangle count in case of a leaf node. To distinguish between a leaf node and an inner node, the highest bit of the triangle count variable is set to 1 for a leaf node. The renderer can then determine at runtime if it has intersected an inner node or a leaf node by checking the highest bit (with a bitwise AND operation).

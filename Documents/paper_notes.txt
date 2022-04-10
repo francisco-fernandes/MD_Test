@@ -1,0 +1,16 @@
+NMR:
+* closer to native state
+* protein in solution
+* lower resolution
+
+X-Ray:
+* better resolution
+* needs to crystalize well
+* crystal-packing interactions
+* no hydrogens positions
+
+Databases of "good" NMR protein structures:
+* DRESS: a Database of REfined Solution NMR Structures
+http://www.cmbi.ru.nl/dress/
+* Critical Assessment of Automated Structure Determination of Proteins from NMR Data
+http://www.wenmr.eu/wenmr/casd-nmr-data-sets

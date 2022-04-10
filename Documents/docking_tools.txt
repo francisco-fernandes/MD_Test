@@ -1,0 +1,15 @@
+CAPRI:
+http://www.ebi.ac.uk/msd-srv/capri/
+
+Benchmark:
+http://zlab.umassmed.edu/zdock/benchmark.shtml
+
+FFT:
+ZDOCK: http://zdock.umassmed.edu/
+PIPER: http://structure.bu.edu/publication/piper-fft-based-protein-docking-program-pairwise-potentials
+Hex: http://hex.loria.fr/
+FTMap: http://ftmap.bu.edu/
+ClusPro: http://cluspro.bu.edu/login.php
+
+Geometric Hashing:
+PatchDock: http://bioinfo3d.cs.tau.ac.il/PatchDock/

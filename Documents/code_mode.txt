@@ -1,0 +1,14 @@
+				/*
+				if( absmatedist < minObservedPairDistance ) minObservedPairDistance = absmatedist;
+				if( absmatedist > maxObservedPairDistance ) maxObservedPairDistance = absmatedist;
+				if( ( absmatedist > (avgObservedPairDistances/2) ) && ( absmatedist < (3*avgObservedPairDistances/2) ) ){ // distance within the current valid interval range (+/-50% the average)
+					avgObservedPairDistances = ( (weightObservedPairDistances*avgObservedPairDistances) + absmatedist ) / (weightObservedPairDistances+1); // update current average
+					weightObservedPairDistances++; // increase weight
+				} else { // distance outside the current valid range
+					weightObservedPairDistances--; // decrease weight
+					if(weightObservedPairDistances<=0){ // if the current average lost all its weight, set a new average
+						avgObservedPairDistances = absmatedist;
+						weightObservedPairDistances = 1;
+					}
+				}
+				*/

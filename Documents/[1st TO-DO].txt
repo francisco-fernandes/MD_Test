@@ -1,0 +1,11 @@
+* Stats for non-bonded distances:
+	- check closest atom that is not connected, and add distance to paired-distances array
+	- consider atom sub-type (based on which other elements it is bonded to)
+	- create image with histogram of distances (per element and also per sub-type)
+	- use accellerating structure for nearest-neighbours queries?
+
+* Test all possible rotations for all 3x3x3 voxel shapes
+	- group by number of set voxels
+	- devise way to rotate shape bits
+	- compare against already stored
+	- count all different combinations

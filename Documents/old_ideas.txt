@@ -1,0 +1,36 @@
+- set of structures, determine conserved regions
+- index of many structures with fields, determine best fit of new structure
+- positive set, negative set
+
+- indexes, extend 1D to 3D, problems that were previously unfesible became possible
+- not octree but based: octrees would not deal with "cases in the middle"
+- only ? ways of shape continuity
+- captures shape and charge (into one data structure)
+- invariable to rotation (from higher level to lower level, detect rotation)
+- (image) rotation: same node values independently of the rotation of the molecule
+- CAPRI (prot-prot interactions): easy targets are shape complementary; hard targets have conformational changes
+- integrate flexibility: instead of only surface, along backbone... WIP
+- matching time around linear or logarythmic in the size of the query molecule, and independent of number or sizes of database molecules
+- applications: (bellow)
+- detect conserved regions, e.g. virus, polymorphic, high number of mutations
+- detect drug binding site to a molecule
+- prev approaches: FFT of thousands of rotations (each with 1000s of coeffs to get good approx.), based on shape complementarity only; many possible results to check; now can check and discard both
+- account for ligand !flexibility: get best fits for segments of molecule and then check for contiguous locations
+- !flexibility: even if not perfectly shape complementary, if electrostatics match, good starting point for MD refinement
+- protein alignment: by shape or charge (most previous approaches are atoms-by-atom based)
+- protein docking: which section of a protein binds best to a section of another protein
+- detect new binding sites not present in any database (most previous approaches based on structure similarity)
+- construct large assemblies/scaffolds, one molecule at a time, rebuild index, atomic refinement between steps, with waters, etc
+- accelerate MD by setting the best initial placement of molecules instead of random
+- even if not perfect matching, can give best fit because we follow decreasing levels of average values
+- positive set and negative set, e.g molecule that binds to set of proteins in cancer cells but does not bind to set of proteins in good cells (or get best bind/no-bind ratio)
+- future: de novo design
+
+- integrate flexibility? (instead of only surface, consider blocks along the backbone; store set of forces that keep that block in place; update index)
+- integrate hydrophobic information
+- if pattern is very small compared to the text, start at a lower level (that needs to be sorted)
+- charge in each level: average, mode or interval (min/max) ?
+- on the highest levels, probably not needed one distinct value for each single cell
+- high level shape id of a closed small molecule?
+- when going doing to lower level to decide rotation, more then one option can exist, check multiple paths
+

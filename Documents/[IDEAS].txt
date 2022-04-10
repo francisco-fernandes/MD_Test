@@ -1,0 +1,118 @@
+[Molecular Dynamics]
+
+- at spaced intervals (of the size of a water molecule radius), place fake atoms representing water molecules
+	at the grid points near the surface of the molecule
+	test the force of those fake molecules
+
+- test quadratic decrease of force decay instead of linear
+
+- lookup table for distances (square root) calculation
+
+- grid of "distance steps" instead of linear steps (aproximate sphere by a cube)
+
+- test per-axis-pair linked-list with cumulative sum of distances per element to current atom
+	on next atom, simply add/subtract distances off atoms behind/ahead from prev atom to current atom
+	for each atom type keep cumulative distances to each of the simulation box's corners
+	find formula to approximate triangular inequality using those corner distances
+
+- use "double buffering" for atoms positions (and for force field too):
+	one for current position, other for next position
+	move the atom half-way distance (minus delta) between its position and the closest atom in that direction
+	plus extra step to fix incoherent atoms positions (based on bond lengths limits)
+ 
+- use octree but with (8?) overlapping extra levels
+	update all overlapping levels when going bottom-top
+	this is to prevent "close to octree level boundary" errors
+	consider "distance to center of cube" and store weighted value
+	optimize with pre-computed distance-to-center-of-cube table
+
+- calculate/update system global energy in time intervals by processing one atom/residue for each frame
+
+- get histograms of bond distances in steps of 0.1 (?) Angstroms for each atom of each residue
+	get average/min/max lengths
+	create image for that (?)
+
+- get histograms (per element) of outer non-bonded atom distances around current atom
+
+- get average (mode?) relative positions of all atoms inside each residue
+	to allow to add missing hydrogens or other atoms
+	and to enable to load a protein by "creating" it one aminoacid at a time
+
+- from other folding experiments, get approximate values for nanoseconds time and for potential energy
+
+- presentation: choose molecule do fold (?), run it on a few state-of-the-art MD tools, run it on ours
+
+- names: nanoMD , ProteinDebugger
+
+
+
+[Protein Shape+Force Volume/Space Tree Index]
+
+- count all different 3x3x3 shapes rotated and aligned
+
+- iteratively test several grid sizes and check which one the complementary shapes fit best
+
+- for force field score: instead of only one electrostatic energy value, store one negative value and one positive value
+	for instance to account hydrogen bonding
+	draw color as (x,y) of (black, red/blue, purple)
+
+- try: instead of regular SAS, don't considered sidechains (on the outside) to calculate protein surface (only backchain atoms)
+	because the surface gets less "bumpy"
+	test drawing backbone with VdW spheres and sidechains with bond lines only
+	or try replacing with sphere with average radius of that residue type
+
+
+
+[Visualization]
+
+- full semi-transparent force-field (blue to white/transparent/zero to red)
+	option to increase/decrease transparency intensity (or min/max threshold to draw) to view stronger regions
+	also allow viewing by X, Y or Z slices
+
+- draw order by sorting by distance (or only diferences) to center of axis (i.e. minimum coordinates values)
+
+
+
+[Benchmarks]
+
+- More official benchmarks here: http://www.capri-docking.org/resources/#databases-and-benchmark-datasets
+
+- test with small proteins: trp-cage (20), villin (35), insulin (51), trypsin (223?)
+
+- test with large proteins: titin (~34.000), ribosome (4UG0;~200.000), 80S ribosome (4V6X;~237.000)
+
+- more large: HIV-1 capsid (3J3Q;~2.4M) ; Faustovirus major capsid (5J7V;~40M)
+
+
+
+- sources:
+http://proteopedia.org/wiki/index.php/Believe_It_or_Not%21
+http://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/pdbsum/GetPage.pl?template=highlights.html&l=3&highlights=TRUE&o=SINGLE
+
+
+[Challenges]
+
+Critical Assessment of PRediction of Interactions
+http://www.ebi.ac.uk/msd-srv/capri/
+
+Critical Assessment of protein Structure Prediction
+http://predictioncenter.org/index.cgi
+
+Merck Molecular Activity Challenge
+https://www.kaggle.com/c/MerckActivity
+
+D3R Grand Challenge
+https://drugdesigndata.org/about/grand-challenge
+
+BioArt Scientific Image & Video Competition
+http://www.faseb.org/Resources-for-the-Public/Scientific-Contests/BioArt/About-BioArt.aspx
+
+Vizzies Challenge
+https://www.nsf.gov/news/special_reports/scivis/
+
+cellPACK Challenge
+http://www.autopack.org/cellpackchallenge2012
+
+Visualize This! visualization competition
+https://westgrid.github.io/visualizeThis/
+

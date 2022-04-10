@@ -1,7 +1,7 @@
 typedef struct Atom {
 	unsigned int fromResidueId;
 	unsigned char atomIdInsideResidue;
-	char element;
+	char element; // TODO: unnecessary?
 	float coordX;
 	float coordY;
 	float coordZ;
@@ -11,8 +11,7 @@ typedef struct Residue {
 	unsigned char moleculeId;
 	unsigned char fromModelId;
 	char fromChain;
-	// TODO: remove this?
-	signed char numExtraAtoms;
+	signed char numExtraAtoms; // TODO: remove this?
 	unsigned int startPositionInAtomsArray;
 } Residue;
 

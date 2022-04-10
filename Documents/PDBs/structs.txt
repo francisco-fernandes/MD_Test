@@ -1,0 +1,21 @@
+atom/atom dists (symetric)
+4 bonds per atom
+array of all atoms
+
+bondedatom: type, xyz, fromAminoacidId, bondedToAtomIds[4]
+(id 0 for not bonded, use bit fields)
+
+atomtype: letter, name,
+(atomletter2id)
+
+aminoacid: letter, abrev, name, numAtoms, atoms[], 
+(+side terminators)
+
+residue?: firstAtomId (in all atoms list), 
+
+octreecube: numAtomsInside/atomId (union)
+(topLevelMask, store 3bits alternated)
+(array of val to +/- to get to next/prev octree level)
+(values to add/substract to question 26 surrounding leaf cubes)
+
+bondsstats: aatype, min, max, sum, num
